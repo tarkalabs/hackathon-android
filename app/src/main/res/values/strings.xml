@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DayBook</string>
+    <string name="action_settings">Settings</string>
+    <string name="heading">Day Book</string>
+</resources>
