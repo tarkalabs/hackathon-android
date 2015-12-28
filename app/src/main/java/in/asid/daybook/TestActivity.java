@@ -10,7 +10,7 @@ public class TestActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
-        View contentView = LayoutInflater.from(this).inflate(R.layout.profile_layout, null);
+        View contentView = LayoutInflater.from(this).inflate(R.layout.tags_layout, null);
         this.setContentView(contentView);
     }
 }
