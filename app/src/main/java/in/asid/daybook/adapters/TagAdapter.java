@@ -1,7 +1,11 @@
 package in.asid.daybook.adapters;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +19,7 @@ import butterknife.ButterKnife;
 import in.asid.daybook.R;
 import in.asid.daybook.TagDetailsActivity;
 import in.asid.daybook.models.Tag;
+import in.asid.daybook.services.SyncService;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -28,6 +33,14 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
 
         this.realm = Realm.getInstance(context);
         tags = realm.allObjects(Tag.class);
+
+        LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                tags = realm.allObjects(Tag.class);
+                notifyDataSetChanged();
+            }
+        }, new IntentFilter(SyncService.TAGS_SYNCED));
     }
 
     @Override
@@ -52,7 +65,8 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
         newTag.setName(tagName);
         realm.commitTransaction();
         tags = realm.allObjects(Tag.class);
-        notifyDataSetChanged();
+        Intent serviceIntent = new Intent(context, SyncService.class);
+        context.startService(serviceIntent);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -73,6 +87,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
                     Log.i("VIEWHOLDER", event.toString());
                     Intent intent = new Intent(v.getContext(), TagDetailsActivity.class);
                     intent.putExtra("tagName", tagTitle);
+
                     v.getContext().startActivity(intent);
                     return true;
                 }
